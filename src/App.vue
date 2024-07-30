@@ -60,13 +60,17 @@ onMounted(() => {
 });
 //此处还应有个英文名称
 interface Stop {
+  id:string;
   name: string;
+  name_en:string;
   location: [number, number];
 }
 const stops: Stop[] = [];
 const stopsData = (transData: any): Stop[] => {
   stops.push({
+    id:transData.transit.on_station.id,
     name: transData.transit.on_station.name,
+    name_en:transData.transit.on_station.name_en,
     location: [
       Number(transData.transit.on_station.location[0]),
       Number(transData.transit.on_station.location[1]),
@@ -74,12 +78,16 @@ const stopsData = (transData: any): Stop[] => {
   });
   transData.transit.via_stops.forEach((item) => {
     stops.push({
+      id:item.id,
       name: item.name,
+      name_en:item.name_en,
       location: [Number(item.location[0]), Number(item.location[1])],
     });
   });
   stops.push({
+    id:transData.transit.off_station.id,
     name: transData.transit.off_station.name,
+    name_en:transData.transit.off_station.name_en,
     location: [
       Number(transData.transit.off_station.location[0]),
       Number(transData.transit.off_station.location[1]),
@@ -108,12 +116,24 @@ const initData = () => {
     },
   });
   stopsData(transData)
-  stops.forEach(item=>{
+  stops.forEach(item => {
     viewer.entities.add({
-      position:Cesium.Cartesian3.fromDegrees(...item.location),
-      model:{
-        uri:'/src/assets/model/model.gltf',
-        scale:0.1
+      position: Cesium.Cartesian3.fromDegrees(...item.location),
+      model: {
+        uri: '/src/assets/model/model.gltf',
+        scale: 0.1
+      }
+    })
+    viewer.entities.add({
+      id:item.id,
+      position: Cesium.Cartesian3.fromDegrees(...item.location,35),
+      label:{
+        text:item.name,
+        font:"15px Helvetica",
+        style:Cesium.LabelStyle.FILL_AND_OUTLINE,
+        fillColor:Cesium.Color.WHITE,
+        backgroundColor:Cesium.Color.BLACK.withAlpha(0.5),
+        showBackground:true,
       }
     })
   })
