@@ -7,7 +7,6 @@ interface ImageryLoaders {
     hot: Cesium.UrlTemplateImageryProvider;
     cartoVoyager: Cesium.UrlTemplateImageryProvider;
     cartoDark: Cesium.UrlTemplateImageryProvider;
-    stamen: Cesium.UrlTemplateImageryProvider;
     gaode: Cesium.UrlTemplateImageryProvider;
 }
 
@@ -32,15 +31,10 @@ export const loadImagery: ImageryLoaders = {
         minimumLevel: 4,
         maximumLevel: 18,
     }),
-    //加载Stamen地图
-    stamen: new Cesium.UrlTemplateImageryProvider({
-        url: 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png',
-        minimumLevel: 4,
-        maximumLevel: 18,
-    }),
     //加载高德地图
     gaode: new Cesium.UrlTemplateImageryProvider({
-        url: "http://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+        // url: "http://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+        url: 'https://webst02.is.autonavi.com/appmaptile?style=9&x={x}&y={y}&z={z}&ltype=11',
         minimumLevel: 4,
         maximumLevel: 18,
     })

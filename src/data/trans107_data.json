@@ -81,6 +81,7 @@
         "on_station": {
           "name": "白石桥东",
           "id": "110100053356002",
+          "name_en":"bai shi qiao bridge east station",
           "location": [
             116.331734,
             39.938126
@@ -89,6 +90,7 @@
         "off_station": {
           "name": "东直门枢纽站",
           "id": "110100053356022",
+          "name_en":"dong zhi men public transit hub station",
           "location": [
             116.438936,
             39.941645
@@ -1093,6 +1095,7 @@
           {
             "name": "动物园",
             "id": "110100053356003",
+            "name_en":"zoo station",
             "location": [
               116.33584,
               39.937961
@@ -1101,6 +1104,7 @@
           {
             "name": "北京展览馆",
             "id": "110100053356004",
+            "name_en":"bei jing exhibition center station",
             "location": [
               116.343093,
               39.936878
@@ -1109,6 +1113,7 @@
           {
             "name": "二里沟东口",
             "id": "110100053356005",
+            "name_en":"er li gou dong kou station",
             "location": [
               116.343837,
               39.934779
@@ -1117,6 +1122,7 @@
           {
             "name": "三塔寺",
             "id": "110100053356006",
+            "name_en":"san ta si station",
             "location": [
               116.348947,
               39.93236
@@ -1125,6 +1131,7 @@
           {
             "name": "车公庄东",
             "id": "110100053356007",
+            "name_en":"che gong zhuang east station",
             "location": [
               116.358313,
               39.932319
@@ -1133,6 +1140,7 @@
           {
             "name": "官园",
             "id": "110100053356008",
+            "name_en":"guan yuan station",
             "location": [
               116.362457,
               39.932318
@@ -1141,6 +1149,7 @@
           {
             "name": "平安医院",
             "id": "110100053356009",
+            "name_en":"ping an hospital station",
             "location": [
               116.366246,
               39.932335
@@ -1149,6 +1158,7 @@
           {
             "name": "平安里路口东",
             "id": "110100053356010",
+            "name_en":"ping an li intersection east station",
             "location": [
               116.374192,
               39.932635
@@ -1157,6 +1167,7 @@
           {
             "name": "厂桥路口东",
             "id": "110100053356011",
+            "name_en":"chang qiao intersection east station",
             "location": [
               116.382462,
               39.933018
@@ -1165,6 +1176,7 @@
           {
             "name": "东官房",
             "id": "110100053356012",
+            "name_en":"dong guan fang station",
             "location": [
               116.385014,
               39.933108
@@ -1173,6 +1185,7 @@
           {
             "name": "北海北门",
             "id": "110100053356013",
+            "name_en":"bei hai bei men station",
             "location": [
               116.390174,
               39.933333
@@ -1181,6 +1194,7 @@
           {
             "name": "地安门外",
             "id": "110100053356014",
+            "name_en":"di an men wai station",
             "location": [
               116.39626,
               39.934982
@@ -1189,6 +1203,7 @@
           {
             "name": "鼓楼",
             "id": "110100053356015",
+            "name_en":"gu lou station",
             "location": [
               116.39607,
               39.93787
@@ -1197,6 +1212,7 @@
           {
             "name": "宝钞胡同",
             "id": "110100053356016",
+            "name_en":"bao chao hu tong station",
             "location": [
               116.400633,
               39.940823
@@ -1205,6 +1221,7 @@
           {
             "name": "小经厂",
             "id": "110100053356017",
+            "name_en":"xiao jing chang station",
             "location": [
               116.405799,
               39.940867
@@ -1213,6 +1230,7 @@
           {
             "name": "交道口东",
             "id": "110100053356018",
+            "name_en":"jiao dao kou east station",
             "location": [
               116.410144,
               39.940796
@@ -1221,6 +1239,7 @@
           {
             "name": "北新桥路口西",
             "id": "110100053356019",
+            "name_en":"bei xin qiao intersection west station",
             "location": [
               116.41566,
               39.940851
@@ -1229,6 +1248,7 @@
           {
             "name": "东内小街",
             "id": "110100053356020",
+            "name_en":"dong nei xiao jie station",
             "location": [
               116.424573,
               39.940983
@@ -1237,6 +1257,7 @@
           {
             "name": "东直门内",
             "id": "110100053356021",
+            "name_en":"dong zhi men nei station",
             "location": [
               116.431146,
               39.941033
