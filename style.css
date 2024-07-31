@@ -5,3 +5,6 @@
 .cesium-viewer-bottom{
     display: none;
 }
+.highlighted{
+    color: #f7bd42 !important;
+}
