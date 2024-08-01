@@ -7,33 +7,37 @@
       <div>{{ stops[stops.length - 1].name }}</div>
     </div>
     <div class="stopsInfo">
-      <div
-        class="stopStation"
-        v-for="(stop, index) in stops"
-        :key="stop.id"
-        @click="selectStop(index)"
-        :class="{ highlighted: selectedStop === index }"
-      >
+      <div class="stopStation" v-for="(stop, index) in stops" :key="stop.id" @click="selectStop(index)"
+        :class="{ highlighted: selectedStop === index }">
         <!-- <img ref="img" class="img" src="/src/assets/img/icon.png" alt="" /> -->
-        <span class="num">{{ index + 1 }}</span
-        >{{ stop.name }}
+        <span class="num">{{ index + 1 }}</span>{{ stop.name }}
       </div>
     </div>
     <div class="control">
       <div v-if="!play" id="playPauseBtn">
-        <el-icon title="发车" @click="toPlay"><VideoPlay /></el-icon>
+        <el-icon title="发车" @click="toPlay">
+          <VideoPlay />
+        </el-icon>
       </div>
       <div v-else id="playPauseBtn">
-        <el-icon title="停车" @click="toPause"><VideoPause /></el-icon>
+        <el-icon title="停车" @click="toPause">
+          <VideoPause />
+        </el-icon>
       </div>
       <div id="downBtn">
-        <el-icon title="减速" @click="speedDown"><DArrowLeft /></el-icon>
+        <el-icon title="减速" @click="speedDown">
+          <DArrowLeft />
+        </el-icon>
       </div>
       <div id="upBtn">
-        <el-icon title="加速" @click="speedUp"><DArrowRight /></el-icon>
+        <el-icon title="加速" @click="speedUp">
+          <DArrowRight />
+        </el-icon>
       </div>
       <div>
-        <el-icon title="重新发车" @click="toRefresh"><Refresh /></el-icon>
+        <el-icon title="重新发车" @click="toRefresh">
+          <Refresh />
+        </el-icon>
       </div>
       <div>{{ speed }}m/s</div>
     </div>
@@ -47,7 +51,6 @@ import { loadImagery } from "./hook/loadImagery";
 import modifyMap from "./hook/filterColor";
 import rawData from "./data/trans107_data.json";
 import { getSiteTimes, getSampleData } from "./hook/trajectory";
-import { buildProps } from "element-plus/es/utils/index.mjs";
 const transData = rawData.segments[1];
 //车辆信息
 console.log([transData.transit.lines]);
@@ -192,6 +195,12 @@ const toPause = () => {
   viewer.clock.shouldAnimate = false;
 };
 const toRefresh = () => {
+  const upBtn = document.getElementById(
+    "upBtn"
+  ) as HTMLDivElement;
+  const downBtn = document.getElementById(
+    "downBtn"
+  ) as HTMLDivElement;
   const removeEntity = () =>
     viewer.entities.values.find((entity) => {
       if (entity.id === "bus") {
@@ -202,20 +211,57 @@ const toRefresh = () => {
   isBegin.value = true;
   stop_index = 1;
   speed.value = 15;
+  viewer.clockViewModel.multiplier = 1;
+  upBtn.classList.remove("disabled")
+  downBtn.classList.remove("disabled")
   viewer.clock.onTick.removeEventListener(stopPause);
   removeEntity();
 };
 const speed = ref<number>(15);
 const speedDown = () => {
-  if (speed.value != 5) {
-    speed.value = speed.value - 5;
-    viewer.clockViewModel.multiplier *= 0.5;
+  const upBtn = document.getElementById(
+    "upBtn"
+  ) as HTMLDivElement;
+  const downBtn = document.getElementById(
+    "downBtn"
+  ) as HTMLDivElement;
+  upBtn.classList.remove("disabled")
+  speed.value = speed.value - 5;
+  if(speed.value === 20){
+    viewer.clockViewModel.multiplier /= 1.25;
+  }
+  if(speed.value === 15){
+    viewer.clockViewModel.multiplier = 1;
+  }
+  if(speed.value === 10){
+    viewer.clockViewModel.multiplier /= 1.5;
+  }
+  if (speed.value === 5) {
+    viewer.clockViewModel.multiplier /= 2;
+    downBtn.classList.add("disabled")
   }
 };
 const speedUp = () => {
-  if (speed.value != 25) {
-    speed.value = speed.value + 5;
+  const upBtn = document.getElementById(
+    "upBtn"
+  ) as HTMLDivElement;
+  const downBtn = document.getElementById(
+    "downBtn"
+  ) as HTMLDivElement;
+  downBtn.classList.remove("disabled")
+  speed.value = speed.value + 5;
+  if (speed.value === 10) {
     viewer.clockViewModel.multiplier *= 2;
+  }
+  if (speed.value === 15) {
+    viewer.clockViewModel.multiplier = 1;
+  }
+  if (speed.value === 20) {
+    viewer.clockViewModel.multiplier *= 1.3;
+  }
+  if (speed.value === 25) {
+    viewer.clockViewModel.multiplier *= 1.25;
+    upBtn.classList.add("disabled")
   }
 };
 let stop_index = 1;
@@ -279,6 +325,7 @@ onMounted(() => {
   height: 100vh;
   overflow: hidden;
 }
+
 .panel {
   display: flex;
   flex-direction: column;
@@ -287,6 +334,7 @@ onMounted(() => {
   top: 40px;
   z-index: 1000;
   width: 500px;
+
   .fromTo {
     display: flex;
     justify-content: space-between;
@@ -295,19 +343,23 @@ onMounted(() => {
     border: 1px solid #4f7cb1;
     height: 60px;
     padding: 0 30px 0 30px;
+
     div {
       color: #fff;
       font-size: 20px;
       line-height: 30px;
     }
+
     img {
       width: 20%;
     }
   }
+
   .stopsInfo {
     background-color: #142e6a5e;
     text-align: center;
     padding: 0 20px 0 20px;
+
     .stopStation {
       color: #fff;
       font-size: 14px;
@@ -321,6 +373,7 @@ onMounted(() => {
       font-weight: 500;
       margin: 30px 5px 10px 5px;
     }
+
     .num {
       display: inline-block;
       width: 20px;
@@ -328,6 +381,7 @@ onMounted(() => {
       padding-bottom: 6px;
     }
   }
+
   .control {
     display: flex;
     align-items: center;
@@ -336,11 +390,13 @@ onMounted(() => {
     border: 1px solid #4f7cb1;
     height: 50px;
     padding: 0 20px 0 20px;
+
     div {
       width: 30px;
       color: #fff;
       cursor: pointer;
     }
+
     .disabled {
       pointer-events: none;
       opacity: 0.5;
