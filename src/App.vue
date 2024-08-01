@@ -20,21 +20,22 @@
       </div>
     </div>
     <div class="control">
-      <div>
-        <el-icon title="播放" @click="toPlay"><VideoPlay /></el-icon>
+      <div v-if="!play" id="playPauseBtn">
+        <el-icon title="发车" @click="toPlay"><VideoPlay /></el-icon>
+      </div>
+      <div v-else id="playPauseBtn">
+        <el-icon title="停车" @click="toPause"><VideoPause /></el-icon>
+      </div>
+      <div id="downBtn">
+        <el-icon title="减速" @click="speedDown"><DArrowLeft /></el-icon>
+      </div>
+      <div id="upBtn">
+        <el-icon title="加速" @click="speedUp"><DArrowRight /></el-icon>
       </div>
       <div>
-        <el-icon title="暂停" @click="toPause"><VideoPause /></el-icon>
+        <el-icon title="重新发车" @click="toRefresh"><Refresh /></el-icon>
       </div>
-      <div>
-        <el-icon><DArrowLeft /></el-icon>
-      </div>
-      <div>
-        <el-icon><DArrowRight /></el-icon>
-      </div>
-      <div>
-        <el-icon title="重播"><Refresh /></el-icon>
-      </div>
+      <div>{{ speed }}m/s</div>
     </div>
   </div>
 </template>
@@ -46,6 +47,7 @@ import { loadImagery } from "./hook/loadImagery";
 import modifyMap from "./hook/filterColor";
 import rawData from "./data/trans107_data.json";
 import { getSiteTimes, getSampleData } from "./hook/trajectory";
+import { buildProps } from "element-plus/es/utils/index.mjs";
 const transData = rawData.segments[1];
 //车辆信息
 console.log([transData.transit.lines]);
@@ -143,8 +145,10 @@ const initData = () => {
 const selectStop = (index: number) => {
   selectedStop.value = index;
 };
-const toPlay = () => {
-  const timeObj = getSiteTimes(positions.value, 160);
+const play = ref<boolean>(false);
+const isBegin = ref<boolean>(true);
+const toBegin = () => {
+  const timeObj = getSiteTimes(positions.value, 15);
   const start = Cesium.JulianDate.fromDate(new Date());
   const stop = Cesium.JulianDate.addSeconds(
     start,
@@ -154,9 +158,9 @@ const toPlay = () => {
   viewer.clock.startTime = start.clone();
   viewer.clock.stopTime = stop.clone();
   viewer.clock.currentTime = start.clone();
-  viewer.clock.shouldAnimate = true;
   const property = getSampleData(positions.value, start, timeObj.siteTime);
   entities = viewer.entities.add({
+    id: "bus",
     availability: new Cesium.TimeIntervalCollection([
       new Cesium.TimeInterval({
         start: start,
@@ -166,34 +170,83 @@ const toPlay = () => {
     model: {
       uri: "/src/assets/model/bus.gltf",
       minimumPixelSize: 64,
-      scale: 1.2,
+      scale: 2.5,
     },
     position: property,
     orientation: new Cesium.VelocityOrientationProperty(property),
   });
-  //跟随视角
-  viewer.trackedEntity = entities;
   viewer.clock.onTick.addEventListener(stopPause);
 };
+const toPlay = () => {
+  play.value = true;
+  if (isBegin.value) {
+    toBegin();
+    isBegin.value = false;
+  }
+  viewer.clock.shouldAnimate = true;
+  //跟随视角
+  // viewer.trackedEntity = entities;
+};
 const toPause = () => {
+  play.value = false;
   viewer.clock.shouldAnimate = false;
 };
+const toRefresh = () => {
+  const removeEntity = () =>
+    viewer.entities.values.find((entity) => {
+      if (entity.id === "bus") {
+        viewer.entities.remove(entity);
+      }
+    });
+  play.value = false;
+  isBegin.value = true;
+  stop_index = 1;
+  speed.value = 15;
+  viewer.clock.onTick.removeEventListener(stopPause);
+  removeEntity();
+};
+const speed = ref<number>(15);
+const speedDown = () => {
+  if (speed.value != 5) {
+    speed.value = speed.value - 5;
+    viewer.clockViewModel.multiplier *= 0.5;
+  }
+};
+const speedUp = () => {
+  if (speed.value != 25) {
+    speed.value = speed.value + 5;
+    viewer.clockViewModel.multiplier *= 2;
+  }
+};
 let stop_index = 1;
+//到站点就停止
 const stopPause = () => {
-  let sPosition = entities.position.getValue(viewer.clock.currentTime);
-  if (stop_index < stops.value.length) {
+  const currentTime = viewer.clock.currentTime; //当前时间
+  const stopTime = viewer.clock.stopTime; //结束时间
+  let sPosition = entities.position.getValue(currentTime);
+  if (stop_index < stops.value.length - 1) {
     let ePosition = Cesium.Cartesian3.fromDegrees(
       ...stops.value[stop_index].location
     );
     let distance = Cesium.Cartesian3.distance(sPosition, ePosition);
     const randomDelay = Math.floor(Math.random() * (3000 - 1500 + 1)) + 1500;
-    if (distance < 10) {
+    if (distance < 15) {
       viewer.clock.shouldAnimate = false;
+      const playPauseBtn = document.getElementById(
+        "playPauseBtn"
+      ) as HTMLDivElement;
+      playPauseBtn.classList.add("disabled");
       setTimeout(() => {
         viewer.clock.shouldAnimate = true;
+        playPauseBtn.classList.remove("disabled");
       }, randomDelay);
       stop_index++;
     }
+  }
+  if (Cesium.JulianDate.greaterThanOrEquals(currentTime, stopTime)) {
+    //路线已经跑完了
+    toRefresh();
+    return;
   }
 };
 onMounted(() => {
@@ -286,6 +339,11 @@ onMounted(() => {
     div {
       width: 30px;
       color: #fff;
+      cursor: pointer;
+    }
+    .disabled {
+      pointer-events: none;
+      opacity: 0.5;
     }
   }
 }
