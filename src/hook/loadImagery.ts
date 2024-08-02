@@ -34,7 +34,7 @@ export const loadImagery: ImageryLoaders = {
     //加载高德地图
     gaode: new Cesium.UrlTemplateImageryProvider({
         // url: "http://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
-        url: 'https://webst02.is.autonavi.com/appmaptile?style=9&x={x}&y={y}&z={z}&ltype=11',
+        url: '/api/appmaptile?style=9&x={x}&y={y}&z={z}&ltype=11',
         minimumLevel: 4,
         maximumLevel: 18,
     })
