@@ -8,9 +8,15 @@
     </div>
     <div class="stopsInfo">
       <img ref="busstation" class="img" src="/src/assets/img/icon.png" alt="" />
-      <div class="stopStation" v-for="(stop, index) in stops" :key="stop.id" @click="selectStop(index)"
-        :class="{ highlighted: stop_index === index }">
-        <span class="num">{{ index + 1 }}</span>{{ stop.name }}
+      <div
+        class="stopStation"
+        v-for="(stop, index) in stops"
+        :key="stop.id"
+        @click="selectStop(index)"
+        :class="{ highlighted: stop_index === index }"
+      >
+        <span class="num">{{ index + 1 }}</span
+        >{{ stop.name }}
       </div>
     </div>
     <div class="control">
@@ -39,8 +45,12 @@
           <Refresh />
         </el-icon>
       </div>
-      <el-button type="primary" @click="changeView('follow')">跟随视角</el-button>
-      <el-button type="primary" @click="changeView('incar')">车内视角</el-button>
+      <el-button type="primary" @click="changeView('follow')"
+        >跟随视角</el-button
+      >
+      <el-button type="primary" @click="changeView('incar')"
+        >车内视角</el-button
+      >
       <el-button type="primary" @click="changeView('free')">自由视角</el-button>
       <div class="text">{{ speed }}m/s</div>
     </div>
@@ -54,7 +64,7 @@ import { loadImagery } from "./hook/loadImagery";
 import modifyMap from "./hook/filterColor";
 import rawData from "./data/trans107_data.json";
 import { getSiteTimes, getSampleData } from "./hook/trajectory";
-import { offsetCoordinates } from './hook/offsetLocation'
+import { offsetCoordinates } from "./hook/offsetLocation";
 const transData = rawData.segments[1];
 //车辆信息
 console.log([transData.transit.lines]);
@@ -84,7 +94,7 @@ const stopsData = (transData: any): Stop[] => {
       Number(transData.transit.on_station.location[1]),
     ],
   });
-  transData.transit.via_stops.forEach((item) => {
+  transData.transit.via_stops.forEach((item: any) => {
     stopsList.push({
       id: item.id,
       name: item.name,
@@ -104,6 +114,15 @@ const stopsData = (transData: any): Stop[] => {
   return stopsList;
 };
 const initData = () => {
+  const position_gulou = Cesium.Cartesian3.fromDegrees(
+    116.395937,
+    39.94115,
+    45
+  );
+  const hpr = new Cesium.HeadingPitchRoll(Cesium.Math.toRadians(90), 0, 0);
+  const orientation = new Cesium.ConstantProperty(
+    Cesium.Transforms.headingPitchRollQuaternion(position_gulou, hpr)
+  );
   const path = transData.transit.path;
   path.forEach((item) => {
     positions.value.push(
@@ -122,44 +141,44 @@ const initData = () => {
       }),
     },
   });
+  viewer.entities.add({
+    position: position_gulou,
+    orientation: orientation,
+    model: {
+      uri: "/src/assets/model/GuLou.gltf",
+      scale: 3,
+    },
+  });
   const stopsList = stopsData(transData);
   stops.value = stopsList;
   stopsList.forEach((item) => {
-    const location = offsetCoordinates(item.location, -10)
+    const location = offsetCoordinates(item.location, -10);
     viewer.entities.add({
       position: Cesium.Cartesian3.fromDegrees(...location),
       model: {
-        uri: "/src/assets/model/model.gltf",
+        uri: "/src/assets/model/StationBoard.gltf",
         scale: 0.05,
       },
     });
-    // viewer.entities.add({
-    //   id: item.id,
-    //   position: Cesium.Cartesian3.fromDegrees(...location, 35),
-    //   label: {
-    //     text: item.name,
-    //     font: "15px Helvetica",
-    //     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-    //     fillColor: Cesium.Color.WHITE,
-    //     backgroundColor: Cesium.Color.BLACK.withAlpha(0.5),
-    //     showBackground: true,
-    //   },
-    // });
   });
   viewer.flyTo(line, {
     duration: 3,
   });
 };
-const stop_index = ref<number>(0)
+const stop_index = ref<number>(0);
+//二期用数据库来做
 const selectStop = (index: number) => {
-  stop_index.value = index;
+  //stop_index.value = index;
+  console.log(index);
 };
 const play = ref<boolean>(false);
 const isBegin = ref<boolean>(true);
-const busstation = ref()
+const busstation = ref();
 const toBegin = () => {
   stop_index.value = 0;
-  const timeObj = getSiteTimes(positions.value, speed.value);
+  // const timeObj = getSiteTimes(positions.value, speed.value);
+  //一期先这么做 二期再去接数据库优化
+  const timeObj = getSiteTimes(positions.value, 45);
   const start = Cesium.JulianDate.fromDate(new Date());
   const stop = Cesium.JulianDate.addSeconds(
     start,
@@ -179,7 +198,7 @@ const toBegin = () => {
       }),
     ]),
     model: {
-      uri: "/src/assets/model/bus.gltf",
+      uri: "/src/assets/model/Bus.gltf",
       minimumPixelSize: 64,
       scale: 2,
     },
@@ -233,7 +252,6 @@ const speedDown = () => {
   if (speed.value === 5) {
     viewer.clockViewModel.multiplier /= 2;
   }
-  console.log(viewer.clockViewModel.multiplier)
 };
 const speedUp = () => {
   speed.value = speed.value + 5;
@@ -249,7 +267,6 @@ const speedUp = () => {
   if (speed.value === 25) {
     viewer.clockViewModel.multiplier *= 1.25;
   }
-  console.log(viewer.clockViewModel.multiplier)
 };
 let isInCar = false;
 const changeView = (type: string) => {
@@ -286,12 +303,16 @@ const tickEventHandler = () => {
       ); //将相机向后面放一点
     }
   }
-  if (stop_index.value < stops.value.length-1) {
+  if (stop_index.value < stops.value.length - 1) {
     let ePosition = Cesium.Cartesian3.fromDegrees(
       ...stops.value[stop_index.value + 1].location
     );
-    let distance = Cesium.Cartesian3.distance(sPosition, ePosition);
+    let distance = Cesium.Cartesian3.distance(sPosition!, ePosition);
     if (distance < 15 && distance > -15) {
+      if(isInCar&&stop_index.value===12){
+        const audio = new Audio('/src/assets/music/GuLou.mp3');
+        audio.play()
+      }
       viewer.clock.shouldAnimate = false;
       speed.value = 0;
       const playPauseBtn = document.getElementById(
@@ -336,16 +357,16 @@ watch(speed, (newSpeed) => {
   const upBtn = document.getElementById("upBtn") as HTMLDivElement;
   const downBtn = document.getElementById("downBtn") as HTMLDivElement;
   if (newSpeed < 6) {
-    downBtn.classList.add("disabled")
+    downBtn.classList.add("disabled");
   } else {
-    downBtn.classList.remove("disabled")
+    downBtn.classList.remove("disabled");
   }
   if (newSpeed > 24) {
-    upBtn.classList.add("disabled")
+    upBtn.classList.add("disabled");
   } else {
-    upBtn.classList.remove("disabled")
+    upBtn.classList.remove("disabled");
   }
-})
+});
 watch(stop_index, (newIndex) => {
   if (newIndex < 13) {
     busstation.value.style.top = "70px";
@@ -354,7 +375,7 @@ watch(stop_index, (newIndex) => {
     busstation.value.style.top = "230px";
     busstation.value.style.left = 28 + (newIndex - 13) * 35 + "px";
   }
-},)
+});
 </script>
 
 <style lang="scss" scoped>
@@ -412,7 +433,7 @@ watch(stop_index, (newIndex) => {
     .stopStation {
       color: #fff;
       font-size: 14px;
-      cursor: pointer;
+      // cursor: pointer;
       float: left;
       width: 25px;
       height: 125px;
